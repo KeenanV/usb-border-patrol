@@ -1,0 +1,2 @@
+ACTION=="add", RUN+="../main.py"
+# update RUN script target
