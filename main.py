@@ -1,16 +1,24 @@
-# This is a sample Python script.
+#########################
+# USB Border Patrol
+# Main Script
+#########################
+# Dependency Imports
+import usb.core, usb.util
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+##################
 
+# check if there are two USB storage devices plugged in
+def verify_usbs() -> bool:
+    print('blah')
+    busses = usb.busses()
+    print(busses)
+    for bus in busses:
+        print(bus)
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # script has been triggered by a Linux subsystem
+    # assume USB has been plugged in
+    if verify_usbs():
+        # we have verified that two USB storages devices have been connected
+        # now, let's verify its files and copy them to the second USB
+        print("test")
