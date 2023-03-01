@@ -1,2 +1,2 @@
-ACTION=="add", RUN+="../main.py"
+SUBSYSTEM=="block, ACTION=="add", RUN+="../main.py"
 # update RUN script target
