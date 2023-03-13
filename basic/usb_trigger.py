@@ -1,35 +1,56 @@
 import os
 import time
 
-# checks every 5 seconds for two storage devices to be plugged in
-while True:
-  # check for newly mounted devices
-  stream = os.popen('lsblk')
-  output = stream.readlines()
 
-  # maintain a count of partitions
-  sdaCount = 0
-  sdbCount = 0
+def plugin():
+    """
+    Checks every 0.5 seconds for two storage devices to be plugged in
+    :return:
+    """
+    while True:
+        # check for newly mounted devices
+        stream = os.popen('lsblk')
+        output: list[str] = stream.readlines()
 
-  # check for 1st and 2nd mounted devices
-  for line in output:
-    if line.includes('sda'):
-      sdaCount++
-    elif line.includes('sdb'):
-      sdbCount++
+        # maintain a count of partitions
+        sda_count = 0
+        sdb_count = 0
 
-  if sdaCount > 0 and sdbCount > 0:
-    paths = []
-    for i in (sdaCount - 1):
-      paths.append('/dev/sda{}'.format(i + 1))
-    for i in (sdbCount - 1):
-      paths.append('/dev/sdb{}'.format(i+1))
+        # check for 1st and 2nd mounted devices
+        for line in output:
+            if 'sda' in line:
+                sda_count += 1
+            elif 'sdb' in line:
+                sdb_count += 1
 
-    # TODO: change how paths are saved/sent to next script(s)
-    print(paths)
-    
-    # prevent future temporarily, will need to change or final script needs to restart script
-    break
-  else:
-    # missing at least one trigger condition
-    time.sleep(5)
+        if sda_count > 0 and sdb_count > 0:
+            paths = []
+            # sda1 --> "dirty USB" (with malicious files)
+            # sdb1 --> "clean USB" (with zero files) that we copy files from sda1 from
+            # for i in (sda_count - 1):
+            #     paths.append('/dev/sda{}'.format(i + 1))
+            # for i in (sdb_count - 1):
+            #     paths.append('/dev/sdb{}'.format(i + 1))
+
+            # TODO: change how paths are saved/sent to next script(s)
+            print(paths)
+
+            # prevent future temporarily, will need to change or final script needs to restart script
+            unplug()
+
+        time.sleep(0.5)
+
+
+def unplug():
+    """
+    Checks for when all devices are unplugged
+    :return:
+    """
+    while True:
+        stream = os.popen('lsblk')
+        output: str = stream.read()
+
+        if 'sda' not in output and 'sdb' not in output:
+            break
+
+        time.sleep(0.5)
