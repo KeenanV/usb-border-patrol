@@ -1,3 +1,4 @@
+#!/usr/bin/env -S python3 -u
 import os
 import time
 
@@ -32,8 +33,8 @@ def plugin():
             # for i in (sdb_count - 1):
             #     paths.append('/dev/sdb{}'.format(i + 1))
 
-            # TODO: change how paths are saved/sent to next script(s)
-            print(paths)
+            exec("/home/usb-border-patrol/usb-border-patrol/basic/unpack.py", "/dev/sda1")
+            exec("/home/usb-border-patrol/usb-border-patrol/basic/av_script.py", '/dev/sda1')
 
             # prevent future temporarily, will need to change or final script needs to restart script
             unplug()
