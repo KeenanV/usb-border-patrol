@@ -32,6 +32,7 @@ def plugin():
             #     paths.append('/dev/sda{}'.format(i + 1))
             # for i in (sdb_count - 1):
             #     paths.append('/dev/sdb{}'.format(i + 1))
+            print("USBs detected, running Unpacking and AV Scripts")
 
             exec("/home/usb-border-patrol/usb-border-patrol/basic/unpack.py", "/dev/sda1")
             exec("/home/usb-border-patrol/usb-border-patrol/basic/av_script.py", '/dev/sda1')
