@@ -117,7 +117,7 @@ class unpack():
                     self.log.append(file, "Irregular file.")
 
         print("\nDone extracting files")
-        log_file = "unpack_log.txt"
+        log_file = "unpack.log"
         f = open(self.usb_path + "/" + log_file, "w")
         for log in self.log:
            f.write(str(log[0]) + ": " + log[1] + "\n")
