@@ -89,7 +89,7 @@ class unpack():
             usb = Path(self.usb_path)
             for filename in usb.glob("**/*"):
                 if os.path.isfile(filename): # if it's a file
-                    if zipfile.is_zipfile(filename): # magic.from_file(filename, mime=True) == "application/zip":
+                    if zipfile.is_zipfile(filename):
                         self.zip(filename) # unzip it
                     elif tarfile.is_tarfile(filename):
                         self.tar(filename) # unzip it
