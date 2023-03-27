@@ -73,8 +73,8 @@ def main():
 
     # execute scripts
     log("USB storage devices have been mounted, now executing other USB Border Patrol Scripts")
-    os.system('/home/usb-border-patrol/basic/unpack.py /media/untrusted /media/trusted')
-    os.system('/home/usb-border-patrol/basic/av_script.py /media/untrusted /media/trusted')
+    os.system('./unpack.py /media/untrusted /media/trusted')
+    os.system('./av_script.py /media/untrusted /media/trusted')
 
     # eject/unmount USBs
     log("scripts have finished execution...now ejecting USBs")
