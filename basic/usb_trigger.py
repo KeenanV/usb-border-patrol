@@ -32,10 +32,14 @@ def check_usbs():
         return True
 
 def reset():
+    log("resetting system state...may encounter errors (can ignore)")
+    os.system('sudo umount /media/untrusted')
+    os.system('sudo umount /media/trusted')
     if os.path.exists('/dev/sda*'):
         os.system('sudo rm -rf /dev/sda*')
     if os.path.exists('/dev/sdb*'):
         os.system('sudo rm -rf /dev/sdb*')
+    log("finished resetting system state")
 
 def main():
     reset()
@@ -71,6 +75,11 @@ def main():
     log("USB storage devices have been mounted, now executing other USB Border Patrol Scripts")
     os.system('/home/usb-border-patrol/usb-border-patrol/basic/unpack.py /media/untrusted /media/trusted')
     os.system('/home/usb-border-patrol/usb-border-patrol/basic/av_script.py /media/untrusted /media/trusted')
+
+    # eject/unmount USBs
+    log("scripts have finished execution...now ejecting USBs")
+    os.system('sudo umount /media/untrusted')
+    os.system('sudo umount /media/trusted')
 
 if __name__ == "__main__":
     main()
