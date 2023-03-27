@@ -15,8 +15,15 @@ class unpack():
         self.log.append([file_info, msg])
         os.remove(self.usb_path + "/" + filename) # delete the extracted file
         if zip:
-            cmd=['zip', '-d', path] + [filename] # delete the file in the zip
-            subprocess.check_call(cmd)
+            zin = zipfile.ZipFile (path, 'r')
+            zout = zipfile.ZipFile (str(path)[0:len(str(path))-4] + '_new.zip', 'w')
+            for item in zin.infolist():
+                buffer = zin.read(item.filename)
+                if (item.filename != filename):
+                    zout.writestr(item, buffer)
+            zout.close()
+            zin.close()
+            os.remove(path)
         else: 
             os.remove(path)
 
