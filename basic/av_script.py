@@ -1,6 +1,7 @@
 #!/usr/bin/env -S python3 -u
 import os
 import argparse
+import shutil
 from pathlib import Path
 
 def main():
@@ -49,7 +50,7 @@ def main():
     for filename in malicious_usb_path.glob("**/*"):
         file_str = str(filename)
         if filename.is_file():
-            filename.rename(clean_usb_path / filename.name)
+            shutil.move(file_str, str(clean_usb_path))
 
     #moves log file to clean usb
     if malicious_files:
