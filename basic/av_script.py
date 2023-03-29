@@ -55,6 +55,6 @@ def main():
     #moves log file to clean usb
     if malicious_files:
         log_file_path = Path(log_file)
-        log_file_path.rename(clean_usb_path / log_file_path.name)
+        shutil.move(str(log_file_path.name), str(clean_usb_path))
 if __name__ == "__main__":
      main()
