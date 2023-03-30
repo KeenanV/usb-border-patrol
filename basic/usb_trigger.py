@@ -83,6 +83,7 @@ class Trigger:
         self.log("scripts have finished execution...now ejecting USBs")
         os.system('sudo umount /media/untrusted')
         os.system('sudo umount /media/trusted')
+        os.system('./output-test.sh')
 
 
 if __name__ == "__main__":
