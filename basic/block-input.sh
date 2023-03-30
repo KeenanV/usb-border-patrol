@@ -1,14 +1,16 @@
 #!/bin/bash
 
 
-date >> /home/usbbp/devices.log && echo -e "Start\n" >> /home/usbbp/devices.log
+date > $HOME/devices.log && echo -e "Start\n" >> $HOME/devices.log
 
 while true; do
 	events=$(ls /dev/input)
 	substring="event"
 	if [[ $events = *"$substring"* ]]; then
-		date >> /home/usbbp/devices.log && echo -e "Device found\n" >> /home/usbbp/devices.log
-		sudo modprobe -r usbhid
-		date >> /home/usbbp/devices.log && echo -e "Device disabled\n" >> /home/usbbp/devices.log
+		date >> $HOME/devices.log && echo -e "Device found\n" >> $HOME/devices.log
+		# sudo modprobe -r usbhid
+		date >> $HOME/devices.log && echo -e "Device disabled\n" >> $HOME/devices.log
+		$HOME/Documents/capstone/usb-border-patrol/basic/output-test.sh
+		exit
 	fi
 done
