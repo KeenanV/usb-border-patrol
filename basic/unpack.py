@@ -65,6 +65,7 @@ class Unpack:
                 elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, []):  # recursive tars
                     self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
                 else:
+                    print("Ran the else")
                     self.good += 1
 
     # go through a zip file to check for zip bombs
@@ -81,6 +82,8 @@ class Unpack:
                     continue
                 elif magic.from_file(self.usb_path + "/" + z_file.filename, mime=True) == "application/zip":
                     return self.check_bomb(self.usb_path + "/" + z_file.filename, count + 1, zips + [z_file.filename])
+        self.good += 1
+        print("Returned true")
         return True
 
     # go through a tar file to check for tar bombs
