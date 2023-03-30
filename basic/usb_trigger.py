@@ -16,9 +16,9 @@ class Trigger:
         print(text)
 
     def check_usbs(self):
-        '''
+        """
         Checks for any USB connections, returns False when two USBs are found, otherwise returns True.
-        '''
+        """
         stream = os.popen('lsblk')
         output: str = stream.read()
         if 'sda' in output and 'sdb' in output:

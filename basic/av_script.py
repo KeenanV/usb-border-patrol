@@ -9,6 +9,8 @@ class AV:
     def __init__(self, malicious_usb_path, clean_usb_path):
         self.malicious_usb_path = malicious_usb_path
         self.clean_usb_path = clean_usb_path
+        self.good = 0
+        self.bad = 0
 
     def main(self):
         # checks if the malicious directory exists and creates it if not
@@ -37,18 +39,22 @@ class AV:
         log_file = "av_log.log"
         f = open(log_file, "w")
         if malicious_files:
+            self.bad += len(malicious_files)
             f.write("=====================MALICIOUS=====================\n")
             f.write("The following files were infected by known malware.\n")
             f.write("===================================================\n")
             for filename in malicious_files:
                 f.write(str(filename) + "\n")
-        f.close()
 
         # moves non-malicious files to clean usb
         for filename in self.malicious_usb_path.glob("**/*"):
             file_str = str(filename)
             if filename.is_file():
                 shutil.move(file_str, str(self.clean_usb_path))
+                self.good += 1
+
+        f.write(f"Good: {self.good}, Bad: {self.bad}\n")
+        f.close()
 
         # moves log file to clean usb
         if malicious_files:
