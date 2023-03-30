@@ -12,9 +12,12 @@ class Unpack:
     def __init__(self, usb_path):
         self.usb_path = usb_path
         self.log = []
+        self.good = 0
+        self.bad = 0
 
     def remove_file(self, path, filename, file_info, msg, zip):
         self.log.append([file_info, msg])
+        self.bad += 1
         os.remove(self.usb_path + "/" + filename)  # delete the extracted file
         if zip:
             zin = zipfile.ZipFile(path, 'r')
@@ -44,6 +47,8 @@ class Unpack:
                         self.remove_file(path, zfile.filename, zfile, "Zipfile suspiciously large", True)
                     elif not self.check_bomb(self.usb_path + "/" + zfile.filename, 1, []):
                         self.remove_file(path, zfile.filename, zfile, "Potential zip bomb detected", True)
+                    else:
+                        self.good += 1
 
     # unzip it and read the rest of the files
     def tar(self, path):
@@ -59,6 +64,8 @@ class Unpack:
                     self.remove_file(path, tfile.name, tfile, "Tarfile suspiciously large", False)
                 elif not self.check_tbomb(self.usb_path + "/" + tfile.name, 1, []):  # recursive tars
                     self.remove_file(path, tfile.name, tfile, "Potential tar bomb detected", False)
+                else:
+                    self.good += 1
 
     # go through a zip file to check for zip bombs
     def check_bomb(self, path, count, zips):
