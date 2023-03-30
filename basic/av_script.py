@@ -37,14 +37,14 @@ class AV:
 
         # creates a log of the malicious files
         log_file = "av_log.log"
-        f = open(log_file, "w")
-        if malicious_files:
-            self.bad += len(malicious_files)
-            f.write("=====================MALICIOUS=====================\n")
-            f.write("The following files were infected by known malware.\n")
-            f.write("===================================================\n")
-            for filename in malicious_files:
-                f.write(str(filename) + "\n")
+        with open(log_file, "w") as ff:
+            if malicious_files:
+                self.bad += len(malicious_files)
+                ff.write("=====================MALICIOUS=====================\n")
+                ff.write("The following files were infected by known malware.\n")
+                ff.write("===================================================\n")
+                for filename in malicious_files:
+                    ff.write(str(filename) + "\n")
 
         # moves non-malicious files to clean usb
         for filename in self.malicious_usb_path.glob("**/*"):
@@ -53,8 +53,8 @@ class AV:
                 shutil.move(file_str, str(self.clean_usb_path))
                 self.good += 1
 
-        f.write(f"Good: {self.good}, Bad: {self.bad}\n")
-        f.close()
+        with open("gb-tmp.txt", 'a') as ff:
+            ff.write(f"{self.good}\n{self.bad}")
 
         # moves log file to clean usb
         if malicious_files:

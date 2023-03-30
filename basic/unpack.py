@@ -115,11 +115,12 @@ class Unpack:
                         self.tar(filename)  # unzip it
 
         log_file = "unpack.log"
-        f = open(self.usb_path + "/" + log_file, "w")
-        for log in self.log:
-            f.write(str(log[0]) + ": " + log[1] + "\n\n")
-        f.write(f"Good: {self.good}, Bad: {self.bad}\n")
-        f.close()
+        with open(self.usb_path + "/" + log_file, "w") as ff:
+            for log in self.log:
+                ff.write(str(log[0]) + ": " + log[1] + "\n\n")
+
+        with open("gb-tmp.txt", 'w') as ff:
+            ff.write(f"{self.good}\n{self.bad}\n")
         return
 
 
