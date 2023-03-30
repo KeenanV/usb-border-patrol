@@ -58,8 +58,9 @@ class AV:
 
         # moves log file to clean usb
         if malicious_files:
-            log_file_path = Path(log_file)
-            log_file_path.rename(self.clean_usb_path / log_file_path.name)
+            log_file_name = Path(log_file)
+            log_file_path = Path.cwd() / log_file_name
+            shutil.move(str(log_file_path), str(self.clean_usb_path / log_file_name))
 
 
 if __name__ == "__main__":
