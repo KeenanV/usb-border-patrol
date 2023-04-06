@@ -45,8 +45,8 @@ class AV:
                 malicious_files.append(filename)
 
         # creates a log of the malicious files
-        log_file = "av_log.log"
-        with open(log_file, "w") as ff:
+        log_file = "/home/usbbp/tmp/usbbp.log"
+        with open(log_file, "a") as ff:
             if malicious_files:
                 self.bad += len(malicious_files)
                 ff.write("=====================MALICIOUS=====================\n")
@@ -64,13 +64,13 @@ class AV:
         temp_dir_path.rmdir()
 
         with open("/home/usbbp/tmp/gb-tmp.txt", 'a') as ff:
+            print("GOOD BAD")
             ff.write(f"{self.good}\n{self.bad}")
 
         # moves log file to clean usb
         if malicious_files:
             log_file_name = Path(log_file)
-            log_file_path = Path.cwd() / log_file_name
-            shutil.move(str(log_file_path), str(self.clean_usb_path / log_file_name))
+            shutil.move(str(log_file_name), str(self.clean_usb_path / log_file_name))
 
 
 if __name__ == "__main__":

@@ -132,7 +132,7 @@ class Unpack:
                     elif tarfile.is_tarfile(filename):
                         self.tar(filename)  # unzip it
 
-        log_file = "cleaner.log"
+        log_file = "usbbp.log"
         with open(self.usb_path + "/" + log_file, "w") as ff:
             ff.write("=====================ZIP BOMBS=====================\n")
             ff.write("The following files were detected as zip bombs.\n")
@@ -140,7 +140,7 @@ class Unpack:
             for log in self.log:
                 ff.write(str(log[0]) + ": " + log[1] + "\n\n")
 
-        with open("gb-tmp.txt", 'w') as ff:
+        with open("/home/usbbp/tmp/gb-tmp.txt", 'w') as ff:
             ff.write(f"{self.good}\n{self.bad}\n")
         return
 
