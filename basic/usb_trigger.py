@@ -76,8 +76,8 @@ class Trigger:
 
         # execute scripts
         self.log("USB storage devices have been mounted, now executing other USB Border Patrol Scripts")
-        os.system('./unpack.py /media/untrusted')
-        os.system('./av_script.py /media/untrusted /media/trusted')
+        os.system('sudo ./unpack.py /media/untrusted')
+        os.system('sudo ./av_script.py /media/untrusted /media/trusted')
 
         # eject/unmount USBs
         self.log("scripts have finished execution...now ejecting USBs")

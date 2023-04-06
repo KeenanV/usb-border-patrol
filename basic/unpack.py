@@ -119,7 +119,7 @@ class Unpack:
             for log in self.log:
                 ff.write(str(log[0]) + ": " + log[1] + "\n\n")
 
-        with open("gb-tmp.txt", 'w') as ff:
+        with open("/home/usbbp/tmp/gb-tmp.txt", 'w') as ff:
             ff.write(f"{self.good}\n{self.bad}\n")
         return
 
