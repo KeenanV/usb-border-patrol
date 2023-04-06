@@ -19,11 +19,11 @@ class Unpack:
         self.bad = 0
 
     def remove_file(self, path, filename, file_info, msg, zip):
-        self.log.append(["In " + str(path)[len(self.usb_path)+1:] + " found: " + str(file_info), msg])
+        self.log.append(["In " + str(path)[len(self.usb_path) + 1:] + " found: " + str(file_info), msg])
         self.bad += 1
         if zip and os.path.exists(path):
-            zin = zipfile.ZipFile (path, 'r')
-            zout = zipfile.ZipFile (str(path)[0:len(str(path))-4] + '_new.zip', 'w')
+            zin = zipfile.ZipFile(path, 'r')
+            zout = zipfile.ZipFile(str(path)[0:len(str(path)) - 4] + '_new.zip', 'w')
             for item in zin.infolist():
                 buffer = zin.read(item.filename)
                 if item.filename != filename:
@@ -31,18 +31,19 @@ class Unpack:
             zout.close()
             zin.close()
             os.remove(path)
-            os.rename(str(path)[0:len(str(path))-4] + '_new.zip', path)
+            os.rename(str(path)[0:len(str(path)) - 4] + '_new.zip', path)
 
     # unzip it and read the rest of the files
     def zip(self, path):
         with ZipFile(path, 'r') as zObject:
             unzipped = zObject.infolist()
             for z_file in unzipped:
-                zObject.extract(z_file.filename, self.usb_path) # extract all the files
-                if os.path.isdir(self.usb_path + "/" + z_file.filename): # if it's a directory
+                zObject.extract(z_file.filename, self.usb_path)  # extract all the files
+                if os.path.isdir(self.usb_path + "/" + z_file.filename):  # if it's a directory
                     continue
-                if magic.from_file(self.usb_path + "/" + z_file.filename, mime=True) == "application/zip": # recursive zips
-                    if z_file.file_size > 10000000: # if the zip is greater than a certain size drop it (potential bomb)
+                if magic.from_file(self.usb_path + "/" + z_file.filename,
+                                   mime=True) == "application/zip":  # recursive zips
+                    if z_file.file_size > 10000000:  # if the zip is greater than a certain size drop it (potential bomb)
                         self.remove_file(path, z_file.filename, z_file, "Zipfile suspiciously large", True)
                     elif not self.check_bomb(self.usb_path + "/" + z_file.filename, 1, [z_file.filename]):
                         self.remove_file(path, z_file.filename, z_file, "Potential zip bomb detected", True)
@@ -54,33 +55,32 @@ class Unpack:
                     else:
                         self.good += 1
         if os.path.exists(path): os.remove(path)
-    
+
     # unzip it and read the rest of the files
     def tar(self, path):
-        tObject = tarfile.open(path)
-        unzipped = tObject.getmembers()
+        t_object = tarfile.open(path)
+        unzipped = t_object.getmembers()
         for t_file in unzipped:
-            tObject.extract(t_file.name, self.usb_path)
-            if os.path.isdir(self.usb_path + "/" + t_file.name): # if it's a directory
+            t_object.extract(t_file.name, self.usb_path)
+            if os.path.isdir(self.usb_path + "/" + t_file.name):  # if it's a directory
                 continue
             elif tarfile.is_tarfile(self.usb_path + "/" + t_file.name):
-                if t_file.size > 1000000: # if the tar is greater than a certain size drop it (potential bomb)
+                if t_file.size > 1000000:  # if the tar is greater than a certain size drop it (potential bomb)
                     self.remove_file(path, t_file.name, t_file, "Tarfile suspiciously large", False)
-                elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]): # recursive tars
+                elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):  # recursive tars
                     self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
                 else:
                     self.good += 1
-            elif magic.from_file(self.usb_path + "/" + t_file.name, mime=True) == "application/zip": # recursive zips
-                    if not self.check_bomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):
-                        self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
-                    else:
-                        self.good += 1
+            elif magic.from_file(self.usb_path + "/" + t_file.name, mime=True) == "application/zip":  # recursive zips
+                if not self.check_bomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):
+                    self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
+                else:
+                    self.good += 1
         if os.path.exists(path): os.remove(path)
-
 
     # go through a zip file to check for zip bombs
     def check_bomb(self, path, count, zips):
-        if count >= 4: # at least 5 nested zips
+        if count >= 4:  # at least 5 nested zips
             for z in np.unique(zips):
                 os.remove(self.usb_path + "/" + z)
             return False
@@ -88,7 +88,7 @@ class Unpack:
             unzipped = zObject.infolist()
             for z_file in unzipped:
                 zObject.extract(z_file.filename, self.usb_path)
-                if os.path.isdir(self.usb_path + "/" + z_file.filename): # if it's a directory
+                if os.path.isdir(self.usb_path + "/" + z_file.filename):  # if it's a directory
                     continue
                 elif magic.from_file(self.usb_path + "/" + z_file.filename, mime=True) == "application/zip":
                     return self.check_bomb(self.usb_path + "/" + z_file.filename, count + 1, zips + [z_file.filename])
@@ -100,7 +100,7 @@ class Unpack:
 
     # go through a tar file to check for tar bombs
     def check_tbomb(self, path, count, tars):
-        if count >= 4: # at least 5 nested tars
+        if count >= 4:  # at least 5 nested tars
             for t in np.unique(tars):
                 os.remove(self.usb_path + "/" + t)
             return False
@@ -108,7 +108,7 @@ class Unpack:
         unzipped = tObject.getmembers()
         for t_file in unzipped:
             tObject.extract(t_file.name, self.usb_path)
-            if os.path.isdir(self.usb_path + "/" + t_file.name): # if it's a directory
+            if os.path.isdir(self.usb_path + "/" + t_file.name):  # if it's a directory
                 continue
             elif tarfile.is_tarfile(self.usb_path + "/" + t_file.name):
                 return self.check_tbomb(self.usb_path + "/" + t_file.name, count + 1, tars + [t_file.name])
@@ -122,16 +122,16 @@ class Unpack:
         if not os.listdir(self.usb_path):  # if list of files is empty
             print("\nUSB flash is already empty.")  # send a message and continue
         else:
-            widgets = ['Checking for Zip Bombs: ', progressbar.Bar(u"█"),' (', progressbar.ETA(), ') ',]
+            widgets = ['Checking for Zip Bombs: ', progressbar.Bar(u"█"), ' (', progressbar.ETA(), ') ', ]
             pbar = ProgressBar(widgets=widgets).start()
             for filename in pbar(os.listdir(self.usb_path)):
                 filename = os.path.join(self.usb_path, filename)
-                if os.path.isfile(filename): # if it's a file
-                    if zipfile.is_zipfile(filename): 
-                        self.zip(filename) # unzip it
+                if os.path.isfile(filename):  # if it's a file
+                    if zipfile.is_zipfile(filename):
+                        self.zip(filename)  # unzip it
                     elif tarfile.is_tarfile(filename):
-                        self.tar(filename) # unzip it
-                    
+                        self.tar(filename)  # unzip it
+
         log_file = "cleaner.log"
         with open(self.usb_path + "/" + log_file, "w") as ff:
             ff.write("=====================ZIP BOMBS=====================\n")
