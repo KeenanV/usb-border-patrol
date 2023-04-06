@@ -17,10 +17,19 @@ class AV:
         malicious_dir_path = Path.cwd() / "malicious"
         malicious_dir_path.mkdir(parents=True, exist_ok=True)
 
+        # moves all files from malicious usb into temporary directory to prevent clamav error
+        temp_dir_path = Path.cwd() / "temp_dir"
+        temp_dir_path.mkdir(parents=True, exist_ok=True)
+        all_files = os.listdir(str(self.malicious_usb_path))
+        for filename in all_files:
+            old_file_path = str(self.malicious_usb_path / Path(filename))
+            new_file_path = str(temp_dir_path / Path(filename))
+            shutil.move(old_file_path, new_file_path)
+
         # runs all files in the usb directory against the antivirus
         malicious_path_str = str(malicious_dir_path)
         temp_file = open("temp_file.txt", "w")
-        for filename in self.malicious_usb_path.glob("**/*"):
+        for filename in temp_dir_path.glob("**/*"):
             if filename.is_file():
                 temp_file.write(str(filename) + "\n")
         temp_file.close()
@@ -47,11 +56,12 @@ class AV:
                     ff.write(str(filename) + "\n")
 
         # moves non-malicious files to clean usb
-        for filename in self.malicious_usb_path.glob("**/*"):
+        for filename in temp_dir_path.glob("**/*"):
             file_str = str(filename)
             if filename.is_file():
                 shutil.move(file_str, str(self.clean_usb_path))
                 self.good += 1
+        temp_dir_path.rmdir()
 
         with open("/home/usbbp/tmp/gb-tmp.txt", 'a') as ff:
             ff.write(f"{self.good}\n{self.bad}")
