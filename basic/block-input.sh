@@ -10,5 +10,7 @@ while true; do
 		date >> /home/usbbp/devices.log && echo -e "Device found\n" >> /home/usbbp/devices.log
 		sudo modprobe -r usbhid
 		date >> /home/usbbp/devices.log && echo -e "Device disabled\n" >> /home/usbbp/devices.log
+		/home/usbbp/Documents/capstone/usb-border-patrol/basic/output-test.sh id
+		exit
 	fi
 done
