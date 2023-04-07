@@ -61,7 +61,8 @@ class AV:
             if filename.is_file():
                 shutil.move(file_str, str(self.clean_usb_path))
                 self.good += 1
-        temp_dir_path.rmdir()
+
+        shutil.rmtree(str(temp_dir_path))
 
         with open("/home/usbbp/tmp/gb-tmp.txt", 'a') as ff:
             print("GOOD BAD")
