@@ -20,7 +20,6 @@ class Unpack:
 
     def remove_file(self, path, filename, file_info, msg, zip):
         self.log.append(["In " + str(path)[len(self.usb_path) + 1:] + " found: " + str(file_info), msg])
-       # self.bad += 1
         if zip and os.path.exists(path):
             zin = zipfile.ZipFile(path, 'r')
             zout = zipfile.ZipFile(str(path)[0:len(str(path)) - 4] + '_new.zip', 'w')
@@ -45,6 +44,7 @@ class Unpack:
                 if magic.from_file(self.usb_path + "/" + z_file.filename,
                                    mime=True) == "application/zip":  # recursive zips
                     if z_file.file_size > 10000000:  # if the zip is greater than a certain size drop it (potential bomb)
+                        bad = True
                         self.remove_file(path, z_file.filename, z_file, "Zipfile suspiciously large", True)
                     elif not self.check_bomb(self.usb_path + "/" + z_file.filename, 1, [z_file.filename]):
                         bad = True
@@ -53,6 +53,7 @@ class Unpack:
                         self.good += 1
                 elif tarfile.is_tarfile(self.usb_path + "/" + z_file.filename):
                     if not self.check_tbomb(self.usb_path + "/" + z_file.filename, 1, [z_file.filename]):
+                        bad = True
                         self.remove_file(path, z_file.filename, z_file, "Zipfile suspiciously large", True)
                     else:
                         self.good += 1
@@ -70,6 +71,7 @@ class Unpack:
                 continue
             elif tarfile.is_tarfile(self.usb_path + "/" + t_file.name):
                 if t_file.size > 1000000:  # if the tar is greater than a certain size drop it (potential bomb)
+                     bad = True
                     self.remove_file(path, t_file.name, t_file, "Tarfile suspiciously large", False)
                 elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):  # recursive tars
                     bad = True
@@ -78,6 +80,7 @@ class Unpack:
                     self.good += 1
             elif magic.from_file(self.usb_path + "/" + t_file.name, mime=True) == "application/zip":  # recursive zips
                 if not self.check_bomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):
+                    bad = True
                     self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
                 else:
                     self.good += 1
