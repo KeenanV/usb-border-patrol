@@ -133,7 +133,8 @@ class Unpack:
         else:
             widgets = ['Checking for Zip Bombs: ', progressbar.Bar(u"█"), ' (', progressbar.ETA(), ') ', ]
             pbar = ProgressBar(widgets=widgets).start()
-            for filename in pbar(os.listdir(self.usb_path)):
+            usb = Path(self.usb_path)
+            for filename in pbar(usb.glob("**/*")):
                 filename = os.path.join(self.usb_path, filename)
                 if os.path.isfile(filename):  # if it's a file
                     if zipfile.is_zipfile(filename):
