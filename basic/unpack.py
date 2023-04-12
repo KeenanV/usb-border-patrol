@@ -71,7 +71,7 @@ class Unpack:
                 continue
             elif tarfile.is_tarfile(self.usb_path + "/" + t_file.name):
                 if t_file.size > 1000000:  # if the tar is greater than a certain size drop it (potential bomb)
-                     bad = True
+                    bad = True
                     self.remove_file(path, t_file.name, t_file, "Tarfile suspiciously large", False)
                 elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):  # recursive tars
                     bad = True
