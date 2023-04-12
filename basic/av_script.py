@@ -11,6 +11,7 @@ class AV:
         self.clean_usb_path = clean_usb_path
         self.good = 0
         self.bad = 0
+        self.suspicious = 0
 
     def main(self):
         # checks if the malicious directory exists and creates it if not
@@ -43,7 +44,32 @@ class AV:
         for filename in malicious_dir_path.glob("**/*"):
             if filename.is_file():
                 malicious_files.append(filename)
+                    
+        # checks if the suspicious directory exists and creates it if not
+        suspicious_dir_path = Path.cwd() / "suspicious"
+        suspicious_dir_path.mkdir(parents=True, exist_ok=True)
+        
+        #move suspicious and non malicious files to usb
+        suspicious_extensions = [".exe", ".html", ".sfx", ".bat", ".sh", ".vbs", ".dll", ".lnk", ".ps1", ".jar"]
+        remaining_files = temp_dir_path.glob("**/*")
+        suspicious_files = []
+        for filename in remaining_files:
+            is_suspicious = False
+            for extension in suspicious_extensions:
+                if extension in str(filename)[(0 - len(extension)):]:
+                    is_suspicious = True
+            if is_suspicious:
+                self.suspicious += 1
+                shutil.move(filename, suspicious_dir_path)
+            else:
+                self.good += 1
+                suspicious_files.append(str(filename))
+                shutil.move(filename, self.clean_usb_path)
+        if suspicious_files:
+            shutil.move(suspicious_dir_path, self.clean_usb_path)
 
+        shutil.rmtree(str(temp_dir_path))
+        
         # creates a log of the malicious files
         log_file = "/home/usbbp/tmp/usbbp.log"
         with open(log_file, "a") as ff:
@@ -54,24 +80,21 @@ class AV:
                 ff.write("===================================================\n")
                 for filename in malicious_files:
                     ff.write(str(filename) + "\n")
-
-        # moves non-malicious files to clean usb
-        for filename in temp_dir_path.glob("**/*"):
-            file_str = str(filename)
-            if filename.is_file():
-                shutil.move(file_str, str(self.clean_usb_path))
-                self.good += 1
-
-        shutil.rmtree(str(temp_dir_path))
+            if suspicious_files:
+                ff.write("======================SUSPICIOUS======================\n")
+                ff.write("The following file types are known to contain malware.\n")
+                ff.write("Only open them if you trust the source.\n")
+                ff.write("======================================================\n")
+                for filename in suspicious_files:
+                    ff.write(str(filename) + "\n")
 
         with open("/home/usbbp/tmp/gb-tmp.txt", 'a') as ff:
-            print("GOOD BAD")
-            ff.write(f"{self.good}\n{self.bad}")
+            ff.write(f"{self.good}\n{self.bad}\n{self.suspicious}")
 
         # moves log file to clean usb
-        if malicious_files:
-            log_file_name = Path(log_file)
-            shutil.move(str(log_file_name), str(self.clean_usb_path / log_file_name))
+        log_file_absolute_path = Path(log_file)
+        log_file_name = Path("usbbp.log")
+        shutil.move(log_file_absolute_path, self.clean_usb_path / log_file_name)
 
 
 if __name__ == "__main__":
