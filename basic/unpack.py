@@ -20,7 +20,7 @@ class Unpack:
 
     def remove_file(self, path, filename, file_info, msg, zip):
         self.log.append(["In " + str(path)[len(self.usb_path) + 1:] + " found: " + str(file_info), msg])
-        self.bad += 1
+       # self.bad += 1
         if zip and os.path.exists(path):
             zin = zipfile.ZipFile(path, 'r')
             zout = zipfile.ZipFile(str(path)[0:len(str(path)) - 4] + '_new.zip', 'w')
@@ -37,6 +37,7 @@ class Unpack:
     def zip(self, path):
         with ZipFile(path, 'r') as zObject:
             unzipped = zObject.infolist()
+            bad = False
             for z_file in unzipped:
                 zObject.extract(z_file.filename, self.usb_path)  # extract all the files
                 if os.path.isdir(self.usb_path + "/" + z_file.filename):  # if it's a directory
@@ -46,6 +47,7 @@ class Unpack:
                     if z_file.file_size > 10000000:  # if the zip is greater than a certain size drop it (potential bomb)
                         self.remove_file(path, z_file.filename, z_file, "Zipfile suspiciously large", True)
                     elif not self.check_bomb(self.usb_path + "/" + z_file.filename, 1, [z_file.filename]):
+                        bad = True
                         self.remove_file(path, z_file.filename, z_file, "Potential zip bomb detected", True)
                     else:
                         self.good += 1
@@ -55,11 +57,13 @@ class Unpack:
                     else:
                         self.good += 1
         if os.path.exists(path): os.remove(path)
+        if bad: self.bad += 1
 
     # unzip it and read the rest of the files
     def tar(self, path):
         t_object = tarfile.open(path)
         unzipped = t_object.getmembers()
+        bad = False
         for t_file in unzipped:
             t_object.extract(t_file.name, self.usb_path)
             if os.path.isdir(self.usb_path + "/" + t_file.name):  # if it's a directory
@@ -68,6 +72,7 @@ class Unpack:
                 if t_file.size > 1000000:  # if the tar is greater than a certain size drop it (potential bomb)
                     self.remove_file(path, t_file.name, t_file, "Tarfile suspiciously large", False)
                 elif not self.check_tbomb(self.usb_path + "/" + t_file.name, 1, [t_file.name]):  # recursive tars
+                    bad = True
                     self.remove_file(path, t_file.name, t_file, "Potential tar bomb detected", False)
                 else:
                     self.good += 1
@@ -77,6 +82,7 @@ class Unpack:
                 else:
                     self.good += 1
         if os.path.exists(path): os.remove(path)
+        if bad: self.bad += 1
 
     # go through a zip file to check for zip bombs
     def check_bomb(self, path, count, zips):
